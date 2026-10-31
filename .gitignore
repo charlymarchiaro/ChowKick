@@ -17,3 +17,7 @@ bin/
 *.aux
 *.out
 *.synctex*
+
+# external util folders
+.reaper/
+.doxygen/
