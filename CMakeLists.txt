@@ -4,6 +4,13 @@ project(ChowKick VERSION 1.2.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# --------------------------------------------------
+# Redirect the VST3 copy path to the user directory on Windows to bypass admin rights
+if(WIN32)
+    set_directory_properties(PROPERTIES JUCE_VST3_COPY_DIR "$ENV{LOCALAPPDATA}/Programs/Common/VST3")
+endif()
+# --------------------------------------------------
+
 # set default plugin formats to build
 if(IOS)
     set(JUCE_FORMATS Standalone AUv3)
@@ -15,7 +22,7 @@ else()
     option(CHOWKICK_BUILD_WITH_MTS "Link ChowKick with MTS" ON)
 endif()
 
-if (CHOWKICK_BUILD_CLAP AND (CMAKE_VERSION VERSION_LESS 3.21.0))
+if(CHOWKICK_BUILD_CLAP AND (CMAKE_VERSION VERSION_LESS 3.21.0))
     message(WARNING "CLAP builds require CMake version 3.21 or higher! To disable CLAP builds, run CMake configuration with \"-DCHOWKICK_BUILD_CLAP=OFF\"")
 endif()
 
@@ -49,6 +56,9 @@ juce_add_plugin(ChowKick
     REQUIRES_FULL_SCREEN TRUE
     IPHONE_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+    # --------------------------------------------------
+    COPY_PLUGIN_AFTER_BUILD TRUE
+    # --------------------------------------------------
 )
 
 if(CHOWKICK_BUILD_CLAP)
@@ -86,18 +96,18 @@ if(IOS)
     foreach(target IN ITEMS BinaryData juce_plugin_modules ChowKick ChowKick_Standalone ChowKick_AUv3)
         set_target_properties(${target}
             PROPERTIES
-                RUNTIME_OUTPUT_DIRECTORY "./"
-                ARCHIVE_OUTPUT_DIRECTORY "./"
-                LIBRARY_OUTPUT_DIRECTORY "./")
+            RUNTIME_OUTPUT_DIRECTORY "./"
+            ARCHIVE_OUTPUT_DIRECTORY "./"
+            LIBRARY_OUTPUT_DIRECTORY "./")
     endforeach()
 
     set_target_properties(ChowKick_Standalone PROPERTIES
-            XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
-            XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
-            XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
+        XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
+        XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
+        XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
 
     set_target_properties(ChowKick_AUv3 PROPERTIES
-            XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)/ChowKick.app/PlugIns"
-            XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
-            XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
+        XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)/ChowKick.app/PlugIns"
+        XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
+        XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
 endif()
